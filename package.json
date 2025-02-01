@@ -1,18 +1,15 @@
 {
-  "homepage": "https://Ismailhajjix.github.io/nad"
-}
-{
   "name": "nadevo",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://ismailhajjix.github.io/nad",
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "dev": "next dev -p 3002",
     "build": "next build",
     "start": "PORT=3002 react-app-scripts start",
-    "lint": "next lint",
-    "deploy": "next build && touch out/.nojekyll && git add out/ && git commit -m \"Deploy to gh-pages\" && git subtree push --prefix out origin gh-pages"
+    "lint": "next lint"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
