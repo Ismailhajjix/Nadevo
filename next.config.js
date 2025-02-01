@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
+  basePath: '/your-repo-name', // Replace with your repository name
   images: {
     unoptimized: true,
   },
