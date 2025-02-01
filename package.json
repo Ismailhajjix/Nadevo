@@ -2,9 +2,9 @@
   "name": "nadevo",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://ismailhajjix.github.io/nad",
+  "homepage": "https://ismailhajjix.github.io/nadevo",
   "scripts": {
-    "predeploy": "npm run build",
+    "predeploy": "next build && next export",
     "deploy": "gh-pages -d out",
     "dev": "next dev -p 3002",
     "build": "next build",

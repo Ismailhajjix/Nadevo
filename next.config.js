@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  basePath: '/nad',
+  basePath: '/nadevo',
   images: {
     unoptimized: true,
   },
