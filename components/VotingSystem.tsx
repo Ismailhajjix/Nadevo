@@ -3,37 +3,38 @@
 import { useVotingSystem } from "../hooks/useVotingSystem"
 import { PersonCard } from "./PersonCard"
 import { Leaderboard } from "./Leaderboard"
-import { motion, AnimatePresence } from "../utils/motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { toast } from 'react-hot-toast'
-import { VoteCounter } from "./VoteCounter"
 import { CATEGORIES } from "@/types/vote"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { PremiumBackground } from "./PremiumBackground"
 
 export function VotingSystem() {
   const { people, vote, castVote, loading, error } = useVotingSystem()
 
-  // Calculate total votes
-  const totalVotes = people.reduce((sum, person) => sum + person.votes, 0)
-
-  // Group people by category with proper sorting and count
-  const categoriesWithCounts = CATEGORIES.map(category => {
-    const categoryParticipants = people.filter(person => 
-      person.category_id === category.id  // Note: changed from categoryId to category_id
-    )
-    return {
-      ...category,
-      participants: categoryParticipants.sort((a, b) => b.votes - a.votes),
-      count: categoryParticipants.length
-    }
-  })
+  // Group people by category with proper sorting
+  const categoriesWithParticipants = CATEGORIES.map(category => ({
+    ...category,
+    participants: people
+      .filter(person => person.category_id === category.id)
+      .sort((a, b) => b.votes - a.votes)
+  }))
 
   const handleVote = async (personId: string) => {
     try {
       const success = await castVote(personId)
       if (success) {
-        toast.success('تم التصويت بنجاح')
+        toast.success('تم التصويت بنجاح', {
+          style: {
+            background: 'rgba(var(--primary), 0.1)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(var(--primary), 0.2)',
+            color: 'white'
+          }
+        })
       }
     } catch (error: any) {
-      console.error('Error voting:', error)
       toast.error(error.message || 'حدث خطأ أثناء التصويت')
     }
   }
@@ -55,86 +56,93 @@ export function VotingSystem() {
   }
 
   console.log('People:', people)
-  console.log('Categories with counts:', categoriesWithCounts)
+  console.log('Categories with participants:', categoriesWithParticipants)
 
   return (
-    <div className="max-w-7xl mx-auto p-4">
-      {/* Vote Counter */}
-      <div className="max-w-md mx-auto mb-12">
-        <VoteCounter />
-      </div>
+    <>
+      <PremiumBackground />
+      
+      <div className="relative min-h-screen w-full overflow-hidden bg-transparent px-4 pb-20 pt-10">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mx-auto max-w-7xl"
+        >
+          {/* Premium Header */}
+          <motion.div 
+            initial={{ y: -20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="relative mb-16 text-center"
+          >
+            <h1 className="relative z-10 bg-gradient-to-b from-white to-white/70 bg-clip-text text-4xl font-bold text-transparent md:text-5xl lg:text-6xl">
+              التصويت النهائي
+            </h1>
+            <div className="absolute inset-0 -z-10 animate-pulse-slow bg-gradient-to-t from-primary/20 via-primary/5 to-transparent blur-3xl" />
+          </motion.div>
 
-      <AnimatePresence>
-        <div className="space-y-16">
-          {categoriesWithCounts.map((category, categoryIndex) => (
-            <motion.div
-              key={category.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: categoryIndex * 0.1 }}
-              className="space-y-8 bg-black/20 backdrop-blur-lg rounded-2xl p-8"
-            >
-              {/* Category Header */}
-              <div className="text-center space-y-2">
-                <motion.h2 
-                  className="text-2xl font-bold text-primary"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  {category.name}
-                </motion.h2>
-                <motion.p 
-                  className="text-sm text-gray-400"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  {category.count === 0 ? 'لا يوجد مشاركين' : 
-                   category.count === 1 ? 'مشارك واحد' :
-                   category.count === 2 ? 'مشاركان' :
-                   `${category.count} مشاركين`}
-                </motion.p>
-              </div>
-
-              {/* Participants Grid */}
-              <motion.div
+          {/* Categories with Participants */}
+          <div className="space-y-20">
+            {categoriesWithParticipants.map((category) => (
+              <motion.section
+                key={category.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: categoryIndex * 0.2 }}
-                className="grid grid-cols-1 md:grid-cols-3 gap-8"
+                className="relative"
               >
-                {category.participants.map((person) => (
-                  <motion.div
-                    key={person.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
+                {/* Category Header */}
+                <div className="relative mb-8 text-center">
+                  <motion.h2 
+                    className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                   >
-                    <PersonCard 
-                      person={person} 
+                    {category.name}
+                  </motion.h2>
+                  <div className="absolute inset-0 -z-10 animate-pulse-slow bg-gradient-to-t from-primary/10 via-primary/5 to-transparent blur-2xl" />
+                </div>
+
+                {/* Participants Grid */}
+                <motion.div 
+                  className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    show: {
+                      opacity: 1,
+                      transition: {
+                        staggerChildren: 0.1
+                      }
+                    }
+                  }}
+                  initial="hidden"
+                  animate="show"
+                >
+                  {category.participants.map((person) => (
+                    <PersonCard
+                      key={person.id}
+                      person={person}
                       isVoted={vote === person.id}
                       onVote={handleVote}
                       loading={loading}
-                      totalVotes={totalVotes}
                     />
-                  </motion.div>
-                ))}
-              </motion.div>
-            </motion.div>
-          ))}
-        </div>
-      </AnimatePresence>
+                  ))}
+                </motion.div>
+
+                {/* Category Separator */}
+                <div className="mt-16 h-px w-full bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+              </motion.section>
+            ))}
+          </div>
+        </motion.div>
+      </div>
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="mt-12"
       >
-        <Leaderboard people={people} totalVotes={totalVotes} />
+        <Leaderboard people={people} totalVotes={people.reduce((sum, person) => sum + person.votes, 0)} />
       </motion.div>
-    </div>
+    </>
   )
 }
 
