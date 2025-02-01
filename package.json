@@ -5,7 +5,7 @@
   "homepage": "https://ismailhajjix.github.io/nad",
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d out",
     "dev": "next dev -p 3002",
     "build": "next build",
     "start": "PORT=3002 react-app-scripts start",
